@@ -1,5 +1,8 @@
 use clap::{Parser, Subcommand};
 
+mod create;
+mod help;
+
 static VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[derive(Parser)]
@@ -23,7 +26,7 @@ fn main() {
 
     match &cli.command {
         Commands::Create { name, size } => {
-            println!("Called create with {} and {}", name, size);
+            create::create(name, size);
         }
         Commands::Mount { name } => {
             println!("Called mount with {}", name);
