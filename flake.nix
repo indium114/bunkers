@@ -22,7 +22,7 @@
             clippy
             pkg-config
 
-            truncate
+            coreutils
             cryptsetup
           ];
         };
