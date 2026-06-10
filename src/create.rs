@@ -50,5 +50,10 @@ pub fn create(name: &String, size: &u32) -> bool {
         .output()
         .expect("failed to run cryptsetup");
 
+    // TODO: cryptsetup open
+    // TODO: mkfs.ext4
+    // TODO: cryptsetup close
+    // TODO: losetup -d
+
     return true;
 }
