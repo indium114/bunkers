@@ -38,7 +38,11 @@ pub fn create(name: &String, size: &u32) -> bool {
         println!("loop_path does not start with /dev/loop");
         return false;
     }
-    println!("loop_path starts with /dev/loop");
+
+    // MARK: encrypt with LUKS
+    println!(" set a password: ");
+    let mut password: String = String::new();
+    let _ = std::io::stdin().read_line(&mut password).unwrap();
 
     return true;
 }
