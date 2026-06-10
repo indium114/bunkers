@@ -40,9 +40,15 @@ pub fn create(name: &String, size: &u32) -> bool {
     }
 
     // MARK: encrypt with LUKS
-    println!(" set a password: ");
-    let mut password: String = String::new();
-    let _ = std::io::stdin().read_line(&mut password).unwrap();
+    let _ = Command::new(&elevator)
+        .arg("cryptsetup")
+        .arg("luksFormat")
+        .arg(loop_path)
+        .stdin(Stdio::inherit())
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .output()
+        .expect("failed to run cryptsetup");
 
     return true;
 }
