@@ -21,6 +21,9 @@
             rust-analyzer
             clippy
             pkg-config
+
+            truncate
+            cryptsetup
           ];
         };
 
