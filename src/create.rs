@@ -53,7 +53,14 @@ pub fn create(name: &String, size: &u32) -> bool {
         return false;
     }
 
-    // TODO: mkfs.ext4
+    // MARK: format as ext4
+    let _ = Command::new(&elevator)
+        .arg("mkfs.ext4")
+        .arg("/dev/mapper/bunkers-mapper")
+        .stdin(Stdio::inherit())
+        .stdout(Stdio::inherit())
+        .status();
+
     // TODO: cryptsetup close
     // TODO: losetup -d
 
