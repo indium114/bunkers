@@ -68,12 +68,18 @@ pub fn cryptsetup_open(loopdev: &str, mapper: &str, password: Option<&str>) -> b
     return result;
 }
 
-pub fn cryptsetup_close(mapper: &str) {
-    _ = Command::new(determine_elevator())
+pub fn cryptsetup_close(mapper: &str) -> bool {
+    let result = Command::new(determine_elevator())
         .arg("cryptsetup")
-        .arg("open")
+        .arg("close")
         .arg(mapper)
         .stderr(Stdio::inherit())
         .stdin(Stdio::inherit())
-        .stdout(Stdio::inherit());
+        .stdout(Stdio::inherit())
+        .status();
+
+    return match result {
+        Ok(_) => true,
+        Err(_) => false,
+    };
 }

@@ -62,7 +62,7 @@ pub fn create(name: &String, size: &u32) -> bool {
         .status();
 
     // TODO: cryptsetup close
-    help::cryptsetup_close("bunkers-mapper");
+    let _ = help::cryptsetup_close("bunkers-mapper");
 
     // TODO: losetup -d
 
