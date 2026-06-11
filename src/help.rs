@@ -1,4 +1,6 @@
 use dirs;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::fs;
 use std::process::{Command, Stdio};
 use which::which;
@@ -117,4 +119,51 @@ pub fn losetup_detach(path: &str) -> bool {
         Ok(_) => true,
         Err(_) => false,
     };
+}
+
+// MARK: lockfile stuff
+const LOCKFILE: &str = "/tmp/bunkers_lock.json";
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct LockEntry {
+    loop_path: String,
+    mount_path: String,
+}
+
+pub type Lockfile = HashMap<String, LockEntry>;
+
+/// load and save lockfile
+pub fn load_lockfile() -> Lockfile {
+    fs::read_to_string(LOCKFILE)
+        .ok()
+        .and_then(|s| serde_json::from_str(&s).ok())
+        .unwrap_or_default()
+}
+
+pub fn save_lockfile(lock: &Lockfile) -> bool {
+    match serde_json::to_string_pretty(lock) {
+        Ok(json) => fs::write(LOCKFILE, json).is_ok(),
+        Err(_) => false,
+    }
+}
+
+/// lock and unlock helpers
+pub fn lock(name: &str, loopdev: &str, mount: &str) {
+    let mut lock = load_lockfile();
+
+    lock.insert(
+        name.to_string(),
+        LockEntry {
+            loop_path: loopdev.to_string(),
+            mount_path: mount.to_string(),
+        },
+    );
+
+    save_lockfile(&lock);
+}
+
+pub fn unlock(name: &str) {
+    let mut lock = load_lockfile();
+    lock.remove(name);
+    save_lockfile(&lock);
 }
