@@ -1,6 +1,7 @@
 use crate::help::{self, cryptsetup_open, determine_elevator};
 use nix::unistd::{Gid, Uid};
 use std::process::Command;
+use usefulog;
 use which::which;
 
 pub fn mount(name: &String) -> bool {
@@ -26,7 +27,7 @@ pub fn mount(name: &String) -> bool {
             let output_stdout = output.stdout;
             let pass = String::from_utf8_lossy(&output_stdout);
 
-            if pass.trim().starts_with("Error:") {
+            if pass.trim().starts_with("Error:") || pass.trim() == "" {
                 None
             } else {
                 Some(pass.trim().to_string())
@@ -50,7 +51,7 @@ pub fn mount(name: &String) -> bool {
     };
 
     if !fsck_passed {
-        println!("[err] fsck failed on /dev/mapper/{}", &mapper_name);
+        usefulog::err(format!("fsck failed on /dev/mapper/{}", &mapper_name));
         return false;
     }
 
@@ -74,7 +75,7 @@ pub fn mount(name: &String) -> bool {
     // MARK: lock the new mount
     help::lock(&name, &loop_path, &mount_path);
 
-    println!("[ok] successfully mounted {} at {}", &name, &mount_path);
+    usefulog::ok(format!("successfully mounted {} at {}", &name, &mount_path));
 
     return true;
 }

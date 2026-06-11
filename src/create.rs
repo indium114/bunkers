@@ -1,5 +1,6 @@
 use crate::help;
 use std::process::{Command, Stdio};
+use usefulog;
 
 pub fn create(name: &String, size: &u32) -> bool {
     // MARK: create the image
@@ -18,7 +19,7 @@ pub fn create(name: &String, size: &u32) -> bool {
 
     // MARK: make sure that device_path starts with /dev/loop
     if !loop_path.starts_with("/dev/loop") {
-        println!("loop_path does not start with /dev/loop");
+        usefulog::err("loop_path does not start with /dev/loop");
         return false;
     }
 
@@ -36,7 +37,7 @@ pub fn create(name: &String, size: &u32) -> bool {
     // MARK: cryptsetup open
     let result = help::cryptsetup_open(&loop_path, "bunkers-mapper", None);
     if !result {
-        println!("failed to run cryptsetup open");
+        usefulog::err("failed to run cryptsetup open");
         return false;
     }
 
@@ -53,6 +54,8 @@ pub fn create(name: &String, size: &u32) -> bool {
 
     // MARK: detach loop device
     let _ = help::losetup_detach(&loop_path);
+
+    usefulog::ok(format!("created bunker {}", &name));
 
     return true;
 }

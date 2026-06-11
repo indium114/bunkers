@@ -1,5 +1,6 @@
 use crate::help;
 use std::process::{Command, Stdio};
+use usefulog;
 
 pub fn umount(name: &String) -> bool {
     let lock = help::load_lockfile();
@@ -20,7 +21,7 @@ pub fn umount(name: &String) -> bool {
     // MARK: cryptsetup close
     let close_success = help::cryptsetup_close(&mapper_path);
     if !close_success {
-        println!("[err] failed to run cryptsetup close");
+        usefulog::err("failed to run cryptsetup close");
         return false;
     }
 
@@ -34,7 +35,7 @@ pub fn umount(name: &String) -> bool {
     // MARK: unlock in lockfile
     help::unlock(&name);
 
-    println!("[ok] unmounted {}", &name);
+    usefulog::ok(format!("unmounted {}", &name));
 
     return true;
 }
