@@ -1,6 +1,5 @@
 use crate::help;
 use std::process::{Command, Stdio};
-use which::which;
 
 pub fn create(name: &String, size: &u32) -> bool {
     // MARK: create the image
@@ -14,10 +13,7 @@ pub fn create(name: &String, size: &u32) -> bool {
         .expect("failed to run truncate");
 
     // MARK: mount loop device
-    let elevator: String = match which("doas") {
-        Ok(_path) => "doas".to_string(),
-        Err(_) => "sudo".to_string(),
-    };
+    let elevator: String = help::determine_elevator();
     let loop_device = Command::new(&elevator)
         .arg("losetup")
         .arg("--find")
@@ -43,14 +39,16 @@ pub fn create(name: &String, size: &u32) -> bool {
     let _ = Command::new(&elevator)
         .arg("cryptsetup")
         .arg("luksFormat")
-        .arg(loop_path)
+        .arg(&loop_path)
         .stdin(Stdio::inherit())
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .output()
         .expect("failed to run cryptsetup");
 
-    // TODO: cryptsetup open
+    // MARK: cryptsetup open
+    let result = help::cryptsetup_open(&loop_path, "bunkers-mapper", None);
+
     // TODO: mkfs.ext4
     // TODO: cryptsetup close
     // TODO: losetup -d
