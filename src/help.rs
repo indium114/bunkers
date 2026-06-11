@@ -67,3 +67,13 @@ pub fn cryptsetup_open(loopdev: &str, mapper: &str, password: Option<&str>) -> b
 
     return result;
 }
+
+pub fn cryptsetup_close(mapper: &str) {
+    _ = Command::new(determine_elevator())
+        .arg("cryptsetup")
+        .arg("open")
+        .arg(mapper)
+        .stderr(Stdio::inherit())
+        .stdin(Stdio::inherit())
+        .stdout(Stdio::inherit());
+}
