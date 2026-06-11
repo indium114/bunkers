@@ -3,6 +3,7 @@ use clap::{Parser, Subcommand};
 mod create;
 mod help;
 mod mount;
+mod umount;
 
 static VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -33,7 +34,7 @@ fn main() {
             mount::mount(name);
         }
         Commands::Umount { name } => {
-            println!("Called umount with {}", name);
+            umount::umount(name);
         }
     }
 }

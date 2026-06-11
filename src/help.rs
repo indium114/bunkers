@@ -28,6 +28,10 @@ pub fn make_mount_path(name: String) -> String {
     return bunkers_dir() + "/_mount/" + &name;
 }
 
+pub fn mount_path(name: String) -> String {
+    return bunkers_dir() + "/_mount/" + &name;
+}
+
 // MARK: elevator helper
 /// determines whether to use 'sudo' or 'doas' to get root permissions
 pub fn determine_elevator() -> String {
@@ -133,8 +137,8 @@ const LOCKFILE: &str = "/tmp/bunkers_lock.json";
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LockEntry {
-    loop_path: String,
-    mount_path: String,
+    pub loop_path: String,
+    pub mount_path: String,
 }
 
 pub type Lockfile = HashMap<String, LockEntry>;
