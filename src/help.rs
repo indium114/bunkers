@@ -23,6 +23,11 @@ pub fn bunker_path(name: String) -> String {
     return bunkers_dir() + "/" + &name + ".img";
 }
 
+pub fn make_mount_path(name: String) -> String {
+    let _ = fs::create_dir_all(bunkers_dir() + "/_mount/" + &name);
+    return bunkers_dir() + "/_mount/" + &name;
+}
+
 // MARK: elevator helper
 /// determines whether to use 'sudo' or 'doas' to get root permissions
 pub fn determine_elevator() -> String {
