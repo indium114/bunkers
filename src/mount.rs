@@ -27,7 +27,7 @@ pub fn mount(name: &String) -> bool {
             let output_stdout = output.stdout;
             let pass = String::from_utf8_lossy(&output_stdout);
 
-            if pass.trim().starts_with("Error:") {
+            if pass.trim().starts_with("Error:") || pass.trim() == "" {
                 None
             } else {
                 Some(pass.trim().to_string())
