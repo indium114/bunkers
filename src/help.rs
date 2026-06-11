@@ -66,6 +66,8 @@ pub fn cryptsetup_open(loopdev: &str, mapper: &str, password: Option<&str>) -> b
             .status();
     }
 
+    let _ = fs::remove_file("/tmp/bunkers.key");
+
     let result = match cryptsetup_open_command {
         Ok(_) => true,
         Err(_) => false,
