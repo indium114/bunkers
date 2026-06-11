@@ -49,7 +49,7 @@ pub fn cryptsetup_open(loopdev: &str, mapper: &str, password: Option<&str>) -> b
             .arg("open")
             .arg(loopdev)
             .arg(mapper)
-            .arg("--keyfile")
+            .arg("--key-file")
             .arg(keyfile)
             .stdin(Stdio::inherit())
             .stdout(Stdio::inherit())
