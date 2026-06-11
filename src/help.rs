@@ -3,6 +3,7 @@ use std::fs;
 use std::process::{Command, Stdio};
 use which::which;
 
+// MARK: directory helpers
 fn home() -> String {
     let dir = dirs::home_dir();
     return dir
@@ -20,6 +21,8 @@ pub fn bunker_path(name: String) -> String {
     return bunkers_dir() + "/" + &name + ".img";
 }
 
+// MARK: elevator helper
+/// determines whether to use 'sudo' or 'doas' to get root permissions
 pub fn determine_elevator() -> String {
     match which("doas") {
         Ok(_path) => "doas".to_string(),
@@ -27,6 +30,7 @@ pub fn determine_elevator() -> String {
     }
 }
 
+// MARK: cryptsetup helpers
 pub fn cryptsetup_open(loopdev: &str, mapper: &str, password: Option<&str>) -> bool {
     let keyfile = "/tmp/bunkers.key";
 
@@ -84,6 +88,7 @@ pub fn cryptsetup_close(mapper: &str) -> bool {
     };
 }
 
+// MARK: losetup helpers
 pub fn losetup_attach(path: &str) -> String {
     let loop_device = Command::new(determine_elevator())
         .arg("losetup")
@@ -99,4 +104,17 @@ pub fn losetup_attach(path: &str) -> String {
         .unwrap()
         .trim()
         .to_string();
+}
+
+pub fn losetup_detach(path: &str) -> bool {
+    let result = Command::new(determine_elevator())
+        .arg("losetup")
+        .arg("-d")
+        .arg(&path)
+        .status();
+
+    return match result {
+        Ok(_) => true,
+        Err(_) => false,
+    };
 }

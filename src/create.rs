@@ -48,10 +48,11 @@ pub fn create(name: &String, size: &u32) -> bool {
         .stdout(Stdio::inherit())
         .status();
 
-    // TODO: cryptsetup close
+    // MARK: cryptsetup close
     let _ = help::cryptsetup_close("bunkers-mapper");
 
-    // TODO: losetup -d
+    // MARK: detach loop device
+    let _ = help::losetup_detach(&loop_path);
 
     return true;
 }
