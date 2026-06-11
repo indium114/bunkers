@@ -14,6 +14,7 @@ before:
     # good idea to do them here:
     - rm -r .zig-cache || true
     - rustup default stable
+    - cargo install --locked cargo-zigbuild
     - cargo fetch --locked
 
 builds:
