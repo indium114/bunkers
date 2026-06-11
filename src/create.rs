@@ -48,6 +48,10 @@ pub fn create(name: &String, size: &u32) -> bool {
 
     // MARK: cryptsetup open
     let result = help::cryptsetup_open(&loop_path, "bunkers-mapper", None);
+    if !result {
+        println!("failed to run cryptsetup open");
+        return false;
+    }
 
     // TODO: mkfs.ext4
     // TODO: cryptsetup close
