@@ -83,3 +83,20 @@ pub fn cryptsetup_close(mapper: &str) -> bool {
         Err(_) => false,
     };
 }
+
+pub fn losetup_attach(path: &str) -> String {
+    let loop_device = Command::new(determine_elevator())
+        .arg("losetup")
+        .arg("--find")
+        .arg("--show")
+        .arg(&path)
+        .stdin(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .output()
+        .expect("failed to run losetup");
+
+    return String::from_utf8(loop_device.stdout)
+        .unwrap()
+        .trim()
+        .to_string();
+}

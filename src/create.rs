@@ -14,20 +14,7 @@ pub fn create(name: &String, size: &u32) -> bool {
 
     // MARK: mount loop device
     let elevator: String = help::determine_elevator();
-    let loop_device = Command::new(&elevator)
-        .arg("losetup")
-        .arg("--find")
-        .arg("--show")
-        .arg(&path)
-        .stdin(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .output()
-        .expect("failed to run losetup");
-
-    let loop_path: String = String::from_utf8(loop_device.stdout)
-        .unwrap()
-        .trim()
-        .to_string();
+    let loop_path: String = help::losetup_attach(&path);
 
     // MARK: make sure that device_path starts with /dev/loop
     if !loop_path.starts_with("/dev/loop") {
