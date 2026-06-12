@@ -3,6 +3,7 @@ use clap::{Parser, Subcommand};
 mod create;
 mod help;
 mod mount;
+mod status;
 mod umount;
 
 static VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -20,6 +21,7 @@ struct Cli {
 enum Commands {
     Create { name: String, size: u32 },
     Mount { name: String },
+    Status,
     Umount { name: String },
 }
 
@@ -33,6 +35,7 @@ fn main() {
         Commands::Mount { name } => {
             mount::mount(name);
         }
+        Commands::Status => status::status(),
         Commands::Umount { name } => {
             umount::umount(name);
         }
