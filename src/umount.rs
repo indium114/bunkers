@@ -11,12 +11,19 @@ pub fn umount(name: &String) -> bool {
     let mapper_path = "/dev/mapper/bunkers-".to_string() + &name;
 
     // MARK: unmount
-    let _ = Command::new(help::determine_elevator())
+    let umount_status = Command::new(help::determine_elevator())
         .arg("umount")
         .arg(help::mount_path(name.to_string()))
         .stdout(Stdio::inherit())
         .stdin(Stdio::inherit())
         .status();
+    match umount_status {
+        Ok(_) => (),
+        Err(_) => {
+            usefulog::err("failed to unmount device");
+            return false;
+        }
+    }
 
     // MARK: cryptsetup close
     let close_success = help::cryptsetup_close(&mapper_path);
@@ -26,11 +33,18 @@ pub fn umount(name: &String) -> bool {
     }
 
     // MARK: detach loop device
-    let _ = Command::new(help::determine_elevator())
+    let detach_status = Command::new(help::determine_elevator())
         .arg("losetup")
         .arg("-d")
         .arg(&lock_entry.loop_path)
         .status();
+    match detach_status {
+        Ok(_) => (),
+        Err(_) => {
+            usefulog::err("failed to detach loop device");
+            return false;
+        }
+    }
 
     // MARK: unlock in lockfile
     help::unlock(&name);

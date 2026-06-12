@@ -28,6 +28,14 @@ pub fn mount(name: &String) -> bool {
             let pass = String::from_utf8_lossy(&output_stdout);
 
             if pass.trim().starts_with("Error:") || pass.trim() == "" {
+                usefulog::warn("bunker password not stored in `pass`");
+                usefulog::warn(format!(
+                    "it can be stored by running `pass edit bunkers/{}`, and pasting the password into the first line",
+                    &name
+                ));
+                usefulog::warn(
+                    "when done this way, bunkers will automatically detect the password and unlock your bunker for you",
+                );
                 None
             } else {
                 Some(pass.trim().to_string())
@@ -37,7 +45,11 @@ pub fn mount(name: &String) -> bool {
     };
 
     // MARK: cryptsetup open
-    let _ = cryptsetup_open(&loop_path, &mapper_name, password.as_deref());
+    let open_status = cryptsetup_open(&loop_path, &mapper_name, password.as_deref());
+    if !open_status {
+        usefulog::err("failed to open encrypted loop device");
+        return false;
+    }
 
     // MARK: run fsck
     let fsck_passed = match Command::new(determine_elevator())
@@ -57,20 +69,34 @@ pub fn mount(name: &String) -> bool {
 
     // MARK: actually mount the thing
     let mount_path: String = help::make_mount_path(name.to_string());
-    let _ = Command::new(determine_elevator())
+    let mount_status = Command::new(determine_elevator())
         .arg("mount")
         .arg(&mapper_path)
         .arg(&mount_path)
         .status();
+    match mount_status {
+        Ok(_) => (),
+        Err(_) => {
+            usefulog::err("failed to mount device");
+            return false;
+        }
+    }
 
     // MARK: chown the mount to the current user
     let uid = Uid::current().as_raw();
     let gid = Gid::current().as_raw();
-    let _ = Command::new(determine_elevator())
+    let chown_status = Command::new(determine_elevator())
         .arg("chown")
         .arg(format!("{uid}:{gid}"))
         .arg(&mount_path)
         .status();
+    match chown_status {
+        Ok(_) => (),
+        Err(_) => {
+            usefulog::err("failed to chown mount directory to current user");
+            return false;
+        }
+    }
 
     // MARK: lock the new mount
     help::lock(&name, &loop_path, &mount_path);
