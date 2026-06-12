@@ -5,7 +5,7 @@ use usefulog;
 pub fn umount(name: &String) -> bool {
     let lock = help::load_lockfile();
     let Some(lock_entry) = lock.get(name) else {
-        println!("[err] {} is not mounted", &name);
+        usefulog::err(format!("{} is not mounted", &name));
         return false;
     };
     let mapper_path = "/dev/mapper/bunkers-".to_string() + &name;
