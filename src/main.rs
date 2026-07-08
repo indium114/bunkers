@@ -19,9 +19,13 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// create a new bunker
     Create { name: String, size: u32 },
+    /// mount a bunker
     Mount { name: String },
+    /// see the status of your bunkers
     Status,
+    /// unmount a bunker
     Umount { name: String },
 }
 
