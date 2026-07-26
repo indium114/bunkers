@@ -10,13 +10,21 @@
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, naersk }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      naersk,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = import nixpkgs { inherit system; };
 
-        naersk' = pkgs.callPackage naersk {};
-      in {
+        naersk' = pkgs.callPackage naersk { };
+      in
+      {
         devShells.default = pkgs.mkShell {
           name = "rust-devshell";
 
@@ -35,11 +43,21 @@
 
         packages.bunkers = naersk'.buildPackage {
           src = ./.;
+
+          nativeBuildInputs = [
+            pkgs.makeBinaryWrapper
+          ];
+
+          postInstall = ''
+            wrapProgram $out/bin/bunkers \
+              --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.cryptsetup ]}
+          '';
         };
 
         apps.bunkers = {
           type = "app";
           program = "${self.packages.${pkgs.stdenv.hostPlatform.system}.bunkers}/bin/bunkers"; # TODO: Change
         };
-      });
+      }
+    );
 }
